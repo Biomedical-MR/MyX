@@ -1,2 +1,2 @@
 # MyX
-MR Image processing pipeline.
+MR Image processing pipeline. Development.
