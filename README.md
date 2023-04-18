@@ -1,4 +1,2 @@
 # MyX
-MR Image processing pipeline
-
-Prueba
+MR Image processing pipeline.
