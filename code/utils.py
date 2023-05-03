@@ -1,11 +1,10 @@
-import os
-import numpy as np
-import cv2
-import matplotlib.pyplot as plt
-from PIL import Image
 from pathlib import Path
 
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 from dipy.io.image import load_nifti, save_nifti
+from PIL import Image
 from scipy.ndimage import rotate
 
 
