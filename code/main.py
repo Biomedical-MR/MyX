@@ -7,7 +7,7 @@ import warnings
 from pathlib import Path
 
 import file_system_functions as fs
-from preprocessing import Preprocessing, ask_yes_no_mask, ask_yes_no_preprocessing
+from preprocessing import Preprocessing
 from processing import DTIProcessor, MTProcessor, TimeCollector, TMapProcessor
 from utils import Headermsg as hmg
 from utils import Mask, ask_user
@@ -75,7 +75,7 @@ def main():
         current_modal = study_name.split("_")[0]
         print(f"\n\n{hmg.new_modal}Procesamiento del mapa de {current_modal}")
 
-        mask_path = Path("/".join(study.parts[0:-1])) / "mask.nii"
+        mask_path = Path("/".join(study.parts[:-1])) / "mask.nii"
         if mask_path.exists():
             reuse_mask = ask_user(
                 "¿Deseas reutilizar la máscara creada para este sujeto?"
