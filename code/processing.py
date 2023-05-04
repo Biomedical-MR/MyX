@@ -1,6 +1,6 @@
 import glob
 import os
-import re  # Added by Raquel
+import re
 import shutil
 import tkinter as tk
 import warnings
@@ -8,7 +8,6 @@ from pathlib import Path
 from tkinter import *
 
 import dipy.reconst.dti as dti
-import file_system_functions as fs  # Added by Raquel
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +22,7 @@ from dipy.reconst.dti import (
     fractional_anisotropy,
 )
 from myrelax import getT1TR, getT2T2star
-from utils import Headermsg as hmg  # Added by Raquel
+from utils import Headermsg as hmg
 from utils import ask_user
 
 warnings.filterwarnings("ignore")
@@ -127,7 +126,7 @@ class MTProcessor:
                             )
                             input_ready = False
                             break
-                except:
+                except Exception:
                     print(
                         f'\n{hmg.error}Por favor, introduce sólo números separados por "," (si hay más de uno).'
                     )
@@ -194,7 +193,7 @@ class MTProcessor:
 
                     try:
                         os.mkdir(str(self.mt_study_path / str(i)))
-                    except:
+                    except Exception:
                         pass
 
                     # save as .nii file and save heatmaps
@@ -589,48 +588,79 @@ class DTIProcessor:
         # design matrix computed as:
         #   bi[gxi^2, gyi^2, gzi^2, 2*gxi*gyi, 2*gxi*gzi, 2*gyi*gzi, -1],
         # and -1 will be multiplied by ln(S0)
-        design_matrix = tensor_model.design_matrix
+
+        # design_matrix = tensor_model.design_matrix
+
         # get errors between the real signal and the predicted signal per our model
-        residuals = self.get_residuals(design_matrix, data)
+
+        # residuals = self.get_residuals(design_matrix, data)
 
         # get basal information
-        basal_residuals = residuals[:, :, :, 0:n_basal]
-        basal_data = data[:, :, :, 0:n_basal]
+        # basal_residuals = residuals[:, :, :, 0:n_basal]
+        # basal_data = data[:, :, :, 0:n_basal]
+
+        # get the signal predicted by the fitted DTI model
+        # the predicted signal is normalized, as it is divided by S0
+        predicted_signal = tensor_fit.predict(gtab)
+
+        # s0 is the average of the basal images (no diffusion gradient)
+        s0 = np.mean(data[:, :, :, :n_basal], axis=3)
+
+        # normalize our original image dividing by s0
+        norm_data = np.zeros(data.shape)
+        for i in range(data.shape[2]):
+            for j in range(data.shape[3]):
+                norm_data[:, :, i, j] += data[:, :, i, j] / s0[:, :, i]
+
+        # get residuals: difference between real data and predicted data
+        residuals = norm_data - predicted_signal
 
         R2_maps = []
         print(f"\n{hmg.info}Generando mapas de R\u00b2.")
         if n_b_val > 1:
             for d in range(0, n_dirs):
                 # residuals
-                dir_res = residuals[
-                    :, :, :, (leap[d] + 1) : ((leap[d]) + (1 + n_b_val))
-                ]
-                full_res = np.concatenate((basal_residuals, dir_res), axis=-1)
+                # dir_res = residuals[
+                #     :, :, :, (leap[d] + 1) : ((leap[d]) + (1 + n_b_val))
+                # ]
+                # full_res = np.concatenate((basal_residuals, dir_res), axis=-1)
 
-                # data
-                dir_data = data[:, :, :, (leap[d] + 1) : ((leap[d]) + (1 + n_b_val))]
-                # concatenates basals with directions
-                full_data = np.concatenate((basal_data, dir_data), axis=-1)
+                # # data
+                # dir_data = data[:, :, :, (leap[d] + 1) : ((leap[d]) + (1 + n_b_val))]
+                # # concatenates basals with directions
+                # full_data = np.concatenate((basal_data, dir_data), axis=-1)
 
                 # compute R^2 maps
-                R2_map = R2MapGenerator().get_R2_map(full_data, full_res)
+                R2_map = R2MapGenerator().get_R2_map(norm_data, residuals)
                 R2_dir_path = self.study_path / ("Dir_" + str(d + 1))
                 R2_dir_path.mkdir(parents=True)
                 save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
                 R2_maps.append(R2_map)
 
+                # save_nifti(
+                #     R2_dir_path / "norm_data", norm_data.astype(np.float32), affine
+                # )
+                # save_nifti(R2_dir_path / "data", data.astype(np.float32), affine)
+                # save_nifti(R2_dir_path / "s0mean", s0.astype(np.float32), affine)
+                # save_nifti(
+                #     R2_dir_path / "residuals", residuals.astype(np.float32), affine
+                # )
+                # save_nifti(
+                #     R2_dir_path / "pred", predicted_signal.astype(np.float32), affine
+                # )
+
         else:
             for d in range(ADC_maps.shape[3]):
-                dir_res = residuals[:, :, :, (n_basal + d)]
-                # add new axis to keep dimensions consistent
-                dir_res = dir_res[:, :, :, np.newaxis]
-                full_res = np.concatenate((basal_residuals, dir_res), axis=-1)
+                # dir_res = residuals[:, :, :, (n_basal + d)]
+                # # add new axis to keep dimensions consistent
+                # dir_res = dir_res[:, :, :, np.newaxis]
+                # full_res = np.concatenate((basal_residuals, dir_res), axis=-1)
 
-                dir_data = data[:, :, :, (n_basal + d)]
-                dir_data = dir_data[:, :, :, np.newaxis]
-                full_data = np.concatenate((basal_data, dir_data), axis=-1)
+                # dir_data = data[:, :, :, (n_basal + d)]
+                # dir_data = dir_data[:, :, :, np.newaxis]
+                # full_data = np.concatenate((basal_data, dir_data), axis=-1)
 
-                R2_map = R2MapGenerator().get_R2_map(full_data, full_res)
+                R2_map = R2MapGenerator().get_R2_map(norm_data, residuals)
                 R2_dir_path = self.study_path / ("Dir_" + str(d + 1))
                 R2_dir_path.mkdir(parents=True)
                 save_nifti(R2_dir_path / "R2_map", R2_map.astype(np.float32), affine)
@@ -839,14 +869,11 @@ class TimeCollector:
 
     def get_requested_times(self, modal: str):
         if modal == "T1":
-            times = self.get_TR()
-            return times
+            return self.get_TR()
         elif modal == "T2":
-            times = self.get_TE()
-            return times
+            return self.get_TE()
         elif modal == "T2E":
-            times = self.get_TE_star()
-            return times
+            return self.get_TE_star()
 
     def get_selected_time(self, selected_modal: str):
         """If it does not exists, fuction returns a file with sequence
@@ -880,11 +907,10 @@ class TimeCollector:
             times = self.get_requested_times(selected_modal)  # collects times
             with open(file_path, "w+") as f:  # creates file
                 f.write(" ".join([str(t) for t in times]))
-            return file_path
-
         else:
             print("[INFO]: Usando archivo de sujeto anterior para tiempos de eco T2")
-            return file_path
+
+        return file_path
 
     def get_times_manual(self):
         """Manually, you get times associated to T1, T2, T2E modalities i.e.

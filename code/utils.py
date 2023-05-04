@@ -12,37 +12,39 @@ from scipy.ndimage import rotate
 class Headermsg:
     # Output en blanco y negro
 
-    info = "[INFO]  "
-    warn = "[WARNING]  "
-    error = "[ERROR]  "
-    success = "[SUCCESS]  "
-    pointer = ">>> "
-    ask = "(?) "
-    welcome = (
-        "\n----------------------\n"
-        + "--  Welcome to MyX  --\n"
-        + "----------------------\n"
-    )
-    new_patient1 = " * STUDY *  "
-    new_patient2 = " * STUDY *  "
-    new_modal = "> MODAL >  "
+    # info = "[INFO]  "
+    # warn = "[WARNING]  "
+    # error = "[ERROR]  "
+    # success = "[SUCCESS]  "
+    # pointer = ">>> "
+    # ask = "(?) "
+    # welcome = (
+    #     "\n----------------------\n"
+    #     + "--  Welcome to MyX  --\n"
+    #     + "----------------------\n"
+    # )
+    # new_patient1 = " * STUDY *  "
+    # new_patient2 = " * STUDY *  "
+    # new_modal = "> MODAL >  "
 
     # Para output en color, comentar las lineas anteriores a esta y descomentar las siguientes
 
-    # info = '\x1b[0;30;44m [INFO] \x1b[0m '
-    # warn = '\x1b[0;30;43m [WARNING] \x1b[0m '
-    # error = '\x1b[0;30;41m [ERROR] \x1b[0m '
-    # success = '\x1b[0;30;42m [SUCCESS] \x1b[0m '
-    # pointer = '\x1b[5;36;40m>>>\x1b[0m '
-    # ask = '\x1b[0;30;46m ? \x1b[0m '
-    # welcome = '\n\x1b[0;30;46m                      \x1b[0m\n' + \
-    # '\x1b[0;30;46m  \x1b[0m                  \x1b[0;30;46m  \x1b[0m\n' + \
-    # '\x1b[0;30;46m  \x1b[0m  \x1b[0;36;40mWelcome to MyX\x1b[0m  \x1b[0;30;46m  \x1b[0m\n' + \
-    # '\x1b[0;30;46m  \x1b[0m                  \x1b[0;30;46m  \x1b[0m\n' + \
-    # '\x1b[0;30;46m                      \x1b[0m\n'
-    # new_patient1 = '\x1b[0;30;47m * STUDY *  '
-    # new_patient2 = ' * STUDY * \x1b[0m '
-    # new_modal = '\x1b[0;30;47m > MODAL > \x1b[0m '
+    info = "\x1b[0;30;44m [INFO] \x1b[0m "
+    warn = "\x1b[0;30;43m [WARNING] \x1b[0m "
+    error = "\x1b[0;30;41m [ERROR] \x1b[0m "
+    success = "\x1b[0;30;42m [SUCCESS] \x1b[0m "
+    pointer = "\x1b[5;36;40m>>>\x1b[0m "
+    ask = "\x1b[0;30;46m ? \x1b[0m "
+    welcome = (
+        "\n\x1b[0;30;46m                      \x1b[0m\n"
+        + "\x1b[0;30;46m  \x1b[0m                  \x1b[0;30;46m  \x1b[0m\n"
+        + "\x1b[0;30;46m  \x1b[0m  \x1b[0;36;40mWelcome to MyX\x1b[0m  \x1b[0;30;46m  \x1b[0m\n"
+        + "\x1b[0;30;46m  \x1b[0m                  \x1b[0;30;46m  \x1b[0m\n"
+        + "\x1b[0;30;46m                      \x1b[0m\n"
+    )
+    new_patient1 = "\x1b[0;30;47m * STUDY *  "
+    new_patient2 = " * STUDY * \x1b[0m "
+    new_modal = "\x1b[0;30;47m > MODAL > \x1b[0m "
 
 
 # ----------------------

@@ -7,6 +7,7 @@ import warnings
 from pathlib import Path
 
 import file_system_functions as fs
+from colorama import just_fix_windows_console
 from preprocessing import Preprocessing
 from processing import DTIProcessor, MTProcessor, TimeCollector, TMapProcessor
 from utils import Headermsg as hmg
@@ -16,6 +17,7 @@ warnings.filterwarnings("ignore")
 
 
 def main():
+    just_fix_windows_console()
     # set the root directory
     print(hmg.welcome)
     print(f"\n{hmg.ask}Selecciona la carpeta de trabajo en la ventana emergente.")
