@@ -27,7 +27,7 @@ class Headermsg:
     # new_patient2 = " * STUDY *  "
     # new_modal = "> MODAL >  "
 
-    # Para output en color, comentar las lineas anteriores a esta y descomentar las siguientes
+    # Para output en color, comentar lineas anteriores a esta y descomentar siguientes
 
     info = "\x1b[0;30;44m [INFO] \x1b[0m "
     warn = "\x1b[0;30;43m [WARNING] \x1b[0m "
@@ -64,7 +64,8 @@ def ask_user(question):
             return False
         else:
             print(
-                f"\n{Headermsg.error}Por favor, introduce una de las dos opciones. [y/n]\n"
+                f"\n{Headermsg.error}Por favor, introduce una de las dos opciones. "
+                "[y/n]\n"
             )
 
 
@@ -138,9 +139,9 @@ class Mask:
                 # cv2.waitKey(1)
             key = cv2.waitKey(1) & 0xFF
             try:
-                ver = len(refPT[counter])  # saves a point
-                line = refPT[counter][ver - 2 : ver]  # creates a line
                 if len(refPT[counter]) > 1:  # after two clicks
+                    ver = len(refPT[counter])  # saves a point
+                    line = refPT[counter][ver - 2 : ver]  # creates a line
                     ima = cv2.line(
                         ima, line[0][0], line[1][0], (255, 255, 255), thickness=2
                     )
@@ -161,7 +162,8 @@ class Mask:
 
         study_name = self.study_subfolder.parts[-2]
         print(
-            f"\n{Headermsg.ask}Crea la máscara para el estudio {str(study_name)} en la ventana emergente.\n"
+            f"\n{Headermsg.ask}Crea la máscara para el estudio {str(study_name)}"
+            " en la ventana emergente.\n"
             "- Click izquierdo: unir las líneas del contorno de selección\n"
             "- Click derecho: cierrar el contorno uniendo primer y último punto\n"
         )
@@ -170,24 +172,24 @@ class Mask:
             try:
                 (nii_data, affine) = load_nifti(
                     self.study_subfolder
-                    / ((self.study_subfolder.parts[-1])[4:] + "_subscan_0.nii.gz")
+                    / f"{self.study_subfolder.parts[-1][4:]}_subscan_0.nii.gz"
                 )
             except FileNotFoundError:
                 (nii_data, affine) = load_nifti(
                     self.study_subfolder
-                    / ((self.study_subfolder.parts[-1])[4:] + ".nii.gz")
+                    / f"{self.study_subfolder.parts[-1][4:]}.nii.gz"
                 )
             nii_data = nii_data[:, :, :, 0]
         else:
             try:
                 (nii_data, affine) = load_nifti(
                     self.study_subfolder
-                    / ((self.study_subfolder.parts[-1])[3:] + "_subscan_0.nii.gz")
+                    / f"{self.study_subfolder.parts[-1][3:]}_subscan_0.nii.gz"
                 )
             except FileNotFoundError:
                 (nii_data, affine) = load_nifti(
                     self.study_subfolder
-                    / ((self.study_subfolder.parts[-1])[3:] + ".nii.gz")
+                    / f"{self.study_subfolder.parts[-1][3:]}.nii.gz"
                 )
 
             if len(np.shape(nii_data)) == 4:
@@ -196,13 +198,11 @@ class Mask:
                 # normalise values to 0-255 range
                 nii_data = self.min_max_normalization(nii_data) * 255
 
-        x_dim, y_dim = np.shape(nii_data)[0:2]  # get real dims
+        x_dim, y_dim = np.shape(nii_data)[:2]  # get real dims
         images = self.prepare_vol(nii_data)
 
-        refPT = []  # list of lists (one list per slice) for storing masks vertexes
-        for i in range(0, len(images)):
-            refPT.append([])
-
+        # list of lists (one list per slice) for storing masks vertexes
+        refPT = [[] for _ in range(len(images))]
         global counter
         counter = 0
         for ima in images:
@@ -230,7 +230,7 @@ class Mask:
 
         plt.tight_layout()
         keyboardClick = False
-        while keyboardClick != True:
+        while not keyboardClick:
             keyboardClick = plt.waitforbuttonpress(0)
         plt.close()
 
@@ -247,7 +247,8 @@ class Mask:
         masks = np.asarray(masks)
         masks = masks.transpose(2, 1, 0)
 
-        # saving mask in both method subfolder and subject folder (for reusing mask purposes)
+        # saving mask in both method subfolder and subject folder
+        # (for reusing mask purposes)
         save_nifti(self.study_subfolder / "mask", masks.astype(np.float32), affine)
         save_nifti(
             Path("/".join(self.study_subfolder.parts[:-1])) / "mask",
